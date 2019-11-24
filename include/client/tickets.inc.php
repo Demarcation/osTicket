@@ -133,7 +133,7 @@ $tickets->order_by($order.$order_by);
 $tickets->values(
     'ticket_id', 'number', 'created', 'isanswered', 'source', 'status_id',
     'status__state', 'status__name', 'cdata__subject', 'dept_id',
-    'dept__name', 'dept__ispublic', 'user__default_email__address', 'user_id', 'user__name'
+    'dept__name', 'dept__ispublic', 'user__default_email__address', 'user_id', 'user__name', 'updated'
 );
 
 ?>
@@ -219,6 +219,9 @@ if ($closedTickets) {?>
             <th width="320">
                 <a href="tickets.php?sort=subject&order=<?php echo $negorder; ?><?php echo $qstr; ?>" title="Sort By Subject"><?php echo __('Subject');?>&nbsp;<i class="icon-sort"></i></a>
             </th>
+            <th width="150">
+                <a href="tickets.php?sort=status&order=<?php echo $negorder; ?><?php echo $qstr; ?>" title="Sort By Updated"><?php echo __('Updated');?>&nbsp;<i class="icon-sort"></i></a>
+            </th>
             <th width="120">
                 <a href="tickets.php?sort=dept&order=<?php echo $negorder; ?><?php echo $qstr; ?>" title="Sort By Department"><?php echo __('Department');?>&nbsp;<i class="icon-sort"></i></a>
             </th>
@@ -262,6 +265,7 @@ if ($closedTickets) {?>
                     <div style="max-height: 1.2em; max-width: 320px;" class="link truncate" href="tickets.php?id=<?php echo $T['ticket_id']; ?>"><?php echo $subject; ?></div>
                     <?php } ?>
                 </td>
+                <td><?php echo $T['updated'];?></td>
                 <td><span class="truncate"><?php echo $dept; ?></span></td>
             </tr>
         <?php

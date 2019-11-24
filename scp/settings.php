@@ -48,6 +48,16 @@ if($page && $_POST && !$errors) {
     }
 }
 
+if ( $_POST['ClearLocks'] == "Clear" ) {
+    echo "Running Clear Locks <br/>";
+    $sql='TRUNCATE TABLE ost_lock';
+    echo $sql."  <br/>";
+    db_query($sql);
+    echo "Clear Locks Complete";
+    #sleep(3);
+    header("Location: ../scp/settings.php?t=tickets");
+}
+
 $config=($errors && $_POST)?Format::input($_POST):Format::htmlchars($cfg->getConfigInfo());
 $ost->addExtraHeader('<meta name="tip-namespace" content="'.$page[1].'" />',
     "$('#content').data('tipNamespace', '".$page[1]."');");

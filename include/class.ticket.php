@@ -1762,6 +1762,7 @@ implements RestrictedAccess, Threadable, Searchable {
 
     function onResponse($response, $options=array()) {
         $this->isanswered = 1;
+        $this->lastupdate = SqlFunction::NOW();
         $this->save();
 
         $vars = array_merge($options,

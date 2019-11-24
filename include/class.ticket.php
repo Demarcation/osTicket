@@ -3474,6 +3474,7 @@ implements RestrictedAccess, Threadable, Searchable {
         $type = array('type' => 'note');
         Signal::send('object.created', $this, $type);
 
+        $this->lastupdate = SqlFunction::NOW();
         return $note;
     }
 

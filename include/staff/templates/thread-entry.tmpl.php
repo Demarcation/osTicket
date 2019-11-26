@@ -71,6 +71,7 @@ if ($user && $cfg->isAvatarsEnabled())
         </span>
         </div>
 <?php
+		if ($entry->type == 'N') {echo "<span style='color:red;font-weight: bold;'>INTERNAL: </span>";};
         echo sprintf(__('<b>%s</b> posted %s'), $name,
             sprintf('<a name="entry-%d" href="#entry-%1$s"><time %s
                 datetime="%s" data-toggle="tooltip" title="%s">%s</time></a>',

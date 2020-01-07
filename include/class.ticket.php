@@ -2751,7 +2751,6 @@ implements RestrictedAccess, Threadable, Searchable {
 
         $this->logEvent('assigned', $data, $user);
 
-        $thisstaff = $staff;
         $key = $data['claim'] ? 'claim' : 'auto';
         $type = array('type' => 'assigned', $key => true);
         Signal::send('object.edited', $this, $type);

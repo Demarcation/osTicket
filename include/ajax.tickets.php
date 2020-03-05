@@ -565,7 +565,7 @@ class TicketsAjaxAPI extends AjaxController {
                             if ($v[0] == '-')
                                 $remove[] = substr($v, 1);
                         if (count($remove)) {
-                            $num = $ticket->thread->referrals
+                            $num = $ticket->getThread()->referrals
                                 ->filter(array('id__in' => $remove))
                                 ->delete();
                             if ($num) {
@@ -640,6 +640,9 @@ class TicketsAjaxAPI extends AjaxController {
                         $clean = Format::striptags($clean) ? $clean : '&mdash;' . __('Empty') .  '&mdash;';
                         if (strlen($clean) > 200)
                              $clean = Format::truncate($clean, 200);
+                        break;
+                    case $field instanceof BooleanField:
+                        $clean = $field->toString($field->getClean());
                         break;
                     default:
                         $clean =  $field->getClean();

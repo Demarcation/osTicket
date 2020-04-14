@@ -1556,11 +1556,17 @@ implements TemplateVariable {
 
     function setExtra($entries, $info=NULL, $thread_id=NULL) {
         foreach ($entries as $entry) {
-            $mergeInfo = new ThreadEntryMergeInfo(array(
-                'thread_entry_id' => $entry->getId(),
-                'data' => json_encode($info),
-            ));
-            $mergeInfo->save();
+            $mergeInfo = ThreadEntryMergeInfo::objects()
+                ->filter(array('thread_entry_id'=>$entry->getId()))
+                ->values_flat('thread_entry_id')
+                ->first();
+            if (!$mergeInfo) {
+                $mergeInfo = new ThreadEntryMergeInfo(array(
+                    'thread_entry_id' => $entry->getId(),
+                    'data' => json_encode($info),
+                ));
+                $mergeInfo->save();
+            }
             $entry->saveExtra($info, $thread_id);
         }
 
@@ -1642,7 +1648,7 @@ implements TemplateVariable {
             'created' => SqlFunction::NOW(),
             'type' => $vars['type'],
             'thread_id' => $vars['threadId'],
-            'title' => Format::sanitize($vars['title'], true),
+            'title' => Format::strip_emoticons(Format::sanitize($vars['title'], true)),
             'format' => $vars['body']->getType(),
             'staff_id' => $vars['staffId'],
             'user_id' => $vars['userId'],

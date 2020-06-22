@@ -1865,6 +1865,7 @@ implements RestrictedAccess, Threadable, Searchable {
 
         $this->isanswered = 0;
         $this->lastupdate = SqlFunction::NOW();
+		$this->duedate = SqlFunction::NOW()->plus(SqlInterval::DAY(1));
         $this->status = 1;
         $this->save();
 

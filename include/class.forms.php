@@ -112,7 +112,7 @@ class Form {
     }
 
     function getTitle() { return $this->title; }
-    function getInstructions() { return $this->instructions; }
+    function getInstructions() { return Format::htmldecode($this->instructions); }
     function getSource() { return $this->_source; }
     function setSource($source) { $this->_source = $source; }
 
@@ -1515,7 +1515,8 @@ class PasswordField extends TextboxField {
 
     function __construct($options=array()) {
         parent::__construct($options);
-        $this->set('validator', 'password');
+        if (!isset($options['validator']))
+            $this->set('validator', 'password');
     }
 
     function parse($value) {

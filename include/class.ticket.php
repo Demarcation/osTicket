@@ -562,7 +562,6 @@ implements RestrictedAccess, Threadable, Searchable {
         return $this->getDueDate() ?: $this->getSLADueDate();
     }
 
-
     function getCloseDate() {
         return $this->closed;
     }
@@ -883,7 +882,6 @@ implements RestrictedAccess, Threadable, Searchable {
         return count($this->tasks->filter(array(
                         'flags__hasbit' => TaskModel::ISOPEN)));
     }
-
 
     function getThreadId() {
         if ($this->getThread())
@@ -1772,7 +1770,6 @@ implements RestrictedAccess, Threadable, Searchable {
     function onResponse($response, $options=array()) {
         $this->isanswered = 1;
         $this->lastupdate = SqlFunction::NOW();
-		$this->duedate = SqlFunction::NOW()->plus(SqlInterval::DAY(1));
         $this->save();
 
         $vars = array_merge($options,
@@ -1860,12 +1857,16 @@ implements RestrictedAccess, Threadable, Searchable {
             $options);
     }
 
-    function onMessage($message, $autorespond=true, $reopen=true) {
+    function onMessage($message, $autorespond=true, $reopen=true, $newticket=false) { # Added a value on end to define this as new ticket, later post messages will update due time, originals will set SLA - ASH
         global $cfg;
 
         $this->isanswered = 0;
         $this->lastupdate = SqlFunction::NOW();
-		$this->duedate = SqlFunction::NOW()->plus(SqlInterval::DAY(1));
+		## Check value to define this as new ticket, later post messages will update due time, originals will set SLA - ASH
+		if ( $newticket == false ) {
+			$this->duedate = SqlFunction::NOW()->plus(SqlInterval::Hour(2));
+			$this->est_duedate = SqlFunction::NOW()->plus(SqlInterval::Hour(2));
+		}
         $this->status = 1;
         $this->save();
 
@@ -2088,6 +2089,7 @@ implements RestrictedAccess, Threadable, Searchable {
                 $sentlist[] = $staff->getEmail();
             }
         }
+		$this->lastupdate = SqlFunction::NOW();
         return true;
     }
 
@@ -3031,7 +3033,7 @@ implements RestrictedAccess, Threadable, Searchable {
     }
 
     // Insert message from client
-    function postMessage($vars, $origin='', $alerts=true) {
+    function postMessage($vars, $origin='', $alerts=true, $newticket=false) { # Added a value on end to define this as new ticket, later post messages will update due time, originals will set SLA - ASH
         global $cfg;
 
         if ($origin)
@@ -3143,7 +3145,8 @@ implements RestrictedAccess, Threadable, Searchable {
         elseif ($autorespond && isset($vars['autorespond']))
             $autorespond = $vars['autorespond'];
 
-        $ticket->onMessage($message, ($autorespond && $alerts), $reopen); //must be called b4 sending alerts to staff.
+
+		$ticket->onMessage($message, ($autorespond && $alerts), $reopen, $newticket); //must be called b4 sending alerts to staff. # Added a value on end to define this as new ticket, later post messages will update due time, originals will set SLA - ASH
 
         if ($autorespond && $alerts
             && $cfg && $cfg->notifyCollabsONNewMessage()
@@ -4352,7 +4355,7 @@ implements RestrictedAccess, Threadable, Searchable {
         //post the message.
         $vars['title'] = $vars['subject']; //Use the initial subject as title of the post.
         $vars['userId'] = $ticket->getUserId();
-        $message = $ticket->postMessage($vars , $origin, false);
+		$message = $ticket->postMessage($vars , $origin, false, true); # Added a value on end to define this as new ticket, later post messages will update due time, originals will set SLA - ASH
 
         // If a message was posted, flag it as the orignal message. This
         // needs to be done on new ticket, so as to otherwise separate the
@@ -4448,6 +4451,7 @@ implements RestrictedAccess, Threadable, Searchable {
 
         // Update the estimated due date in the database
         $ticket->updateEstDueDate();
+
 
         /**********   double check auto-response  ************/
         //Override auto responder if the FROM email is one of the internal emails...loop control.
